@@ -4,17 +4,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Dapper;
 using FirebaseAdmin.Messaging;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using Quartz;
 
 namespace CMS.Notifications.Host.JobsScheduler.Jobs
 {
-    class CheckForExpirationApproachingJob : IJob
+    public static class CheckForExpirationApproachingJob
     {
-        public async Task Execute(IJobExecutionContext context)
+        public static async Task Execute(IConfiguration configuration)
         {
-            var connectionString = context.JobDetail.JobDataMap.GetString("connectionString");
-            var notificationDaysBefore = context.JobDetail.JobDataMap.GetIntValue("NotificationDaysBefore");
+            var connectionString = configuration.GetConnectionString("CarsDbConnectionString");
+            var notificationDaysBefore = configuration.GetValue<int>("NotificationDaysBefore");
 
             try
             {
@@ -41,7 +41,7 @@ namespace CMS.Notifications.Host.JobsScheduler.Jobs
             }
         }
 
-        private async Task SendNotification()
+        private static async Task SendNotification()
         {
             var message = new Message()
             {
